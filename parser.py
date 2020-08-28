@@ -7,6 +7,8 @@ class Parser:
 
         # import BeautifulSoup to parse html-code
         from bs4 import BeautifulSoup
+        # globalize BeautifulSoup
+        self.BeautifulSoup = BeautifulSoup
         # import requests to send GET requests
         import requests
         
@@ -25,21 +27,45 @@ class Parser:
         # set cookie to our session
         self.session.cookies.set_cookie(cookie_PROJECTS)
 
-        # GET first page`s HTML with our session
-        page_html = self.session.get(self.url_template.format('1')).text
-        # convert html to BeautifulSoup
-        soup = BeautifulSoup(page_html,
-                             'html.parser')
-        # by the way, let`s append our first list to self.projects_html
-        self.projects_html.append(soup.find_all('div', 
-                                                class_='x17'))
-        print(self.projects_html)
-
-        # cookie - PROJECTS=programmirovanie
-        # self.session.get(self.url_template.format(page))
+        # Parser() initialized successfuly
 
 
+    def grab_pages_count(self):
+        # pages_count()
+        # This function will define pages count by accessing last page`s footer
+        
+        # There is something interesting about /projects/pN/
+        # If N is not exist, then site would render last existing page
+        # So let`s use this phenomen
+        # define tottaly non existing page id
+        tottaly_non_existing_page_id = 999999999999
+        # request that tottaly non existing page. Site will return last existing page
+        page_html = self.session.get(self.url_template.format(tottaly_non_existing_page_id)).text
 
-# run our Parser app
+        # let`s grab that pages id to get pages count
+        # But first convert html to BeautifulSoup
+        soup = self.BeautifulSoup(page_html,
+                                  'html.parser')
+        # first search for <ul class="pagination"></ul>, where page_count`s box is contained
+        # then search for page_count`s box (<li></li>). It is last ([-1])
+        # finally grab text of that box - pages_count
+        self.pages_count = soup.find('ul',
+                                     class_='pagination').find_all('li')[-1].text
+        
+        # Because we`ve grabed html code, it is string. So, let`s convert pages count to integer
+        self.pages_count = int(self.pages_count)
+        
+        # grab_pages_count() ran successfuly
+        return True
+        
+
+        # NOTE This is how you access projects
+        # soup.find_all('div',
+        #               class_='x17'))
+
+# Let`s run our Parser app
+# first, initialize it
 Parser = Parser()
-Parser.curl_projects()
+# now get pages count
+Parser.grab_pages_count()
+
