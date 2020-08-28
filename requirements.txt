@@ -1,3 +1,4 @@
 bs4==0.0.1
 Beautifulsoup4==4.9.1
 soupsieve==2.0.1
+requests==2.22.0
