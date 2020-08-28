@@ -59,13 +59,36 @@ class Parser:
         return True
         
 
-        # NOTE This is how you access projects
-        # soup.find_all('div',
-        #               class_='x17'))
+    def curl_pages(self):
+        # curl_pages()
+        # This function will grab list of html pages projects
+
+        for page_id in range(1,
+                             self.pages_count
+                             + 1):
+            # grab every page
+
+            # request page html via our session
+            page_html = self.session.get(self.url_template.format(page_id)).text
+            # convert html to BeautifulSoup
+            soup = self.BeautifulSoup(page_html,
+                                      'html.parser')
+
+            # get list of projects in page_id (N) page
+            projects_html = soup.find_all('div',
+                                          class_='x17')
+            # append projects html to global variable
+            self.projects_html.append(projects_html)
+            
+            # curl_pages() ran successfuly
+            return True
+
 
 # Let`s run our Parser app
 # first, initialize it
 Parser = Parser()
 # now get pages count
 Parser.grab_pages_count()
+# curl pages html
+Parser.curl_pages()
 
